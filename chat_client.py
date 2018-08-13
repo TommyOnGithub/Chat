@@ -10,11 +10,9 @@ def handle_send_message(client_name, server_socket):
     print 'Enter your message:'
     message = sys.stdin.readline().strip()
     if not message:
-        if message == '':
-            pass
         print '[ ERROR ] Message could not be read from stdin. exiting.'
         sys.exit()
-    if len(message):
+    else:
         message = client_name + ': ' + message
         try:
             server_socket.send(message.encode())
@@ -31,7 +29,7 @@ def handle_request_ft(client_name, server_socket, ft_listening_port):
         print '[ ERROR ] Filename could not be read from stdin. exiting.'
         sys.exit()
 
-    if len(filename):
+    else:
         request = 'FT_REQUEST:' + owner + ':' + filename + ':' + ft_listening_port
         try:
             # print('request sent at: ' + str(time.time()))
@@ -58,8 +56,8 @@ def handle_option(user_input, client_name, server_socket, ft_listening_port):
         sys.exit()
 
 def usage(script_name):
-    print '[ ERROR ] Usage: python3 ' + script_name + ' -l <listening port number> \
-												-p <connect server port>'
+    print '[ ERROR ] Usage: python3 ' + script_name + ' -l <listening port number> ' \
+	'-p <connect server port>'
 
 def main():
     argc = len(sys.argv)
@@ -92,12 +90,11 @@ def main():
     MR.MessageReceiver(server_socket, client_name).start()
 
     while True:
-        print 'Enter an option (\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   \
-											(F)ile (request)\n   e(X)it'
+        print 'Enter an option (\'m\', \'f\', \'x\'):\n   (M)essage (send)\n' \
+		'   (F)ile (request)\n   e(X)it'
         user_input = sys.stdin.readline().strip()
         if not user_input:
-            print '[ ERROR ] user_input could not be read from stdin. exiting.'
-            sys.exit()
+            pass
         handle_option(user_input, client_name, server_socket, ft_listening_port)
 
 if __name__ == "__main__":
