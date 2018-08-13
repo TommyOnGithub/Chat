@@ -51,4 +51,8 @@ def main():
         handle_new_client(listening_socket, client_socket, message_relay)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print 'Exiting on keyboard interrupt'
+        sys.exit()
