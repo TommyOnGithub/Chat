@@ -6,6 +6,23 @@ import client_handler as CH
 import message_relay as MR
 
 
+"""
+    This module defines a CLI chat server which accepts up to five
+    simultaneous connected users. Users may send messages which are
+    then posted to the other users' client windows.
+
+    In addition to broadcasting messages to the chat users, this
+    server facilitates P2P file transfers. The client sends the
+    name of the desired file (including extention) and the name of
+    the file's owner, and the server writes the file to the
+	client's dedicated file transfer port.
+"""
+
+"""
+    Spins up a new instance of ClientHandler for a client requesting
+    to join the server. After the function completes, the client is
+    connected to the chat.
+"""
 def handle_new_client(server_socket, client_socket, message_relay):
     client_handler = CH.ClientHandler(server_socket, client_socket, message_relay)
     client_handler.start()
