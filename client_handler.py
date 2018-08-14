@@ -1,10 +1,18 @@
+"""
+This module defines the class ClientHandler which runs as its own thread and is responsible
+for both adding a client to the chat server and forwarding its messages to the MesssageRelay class.
+"""
+
 import socket
-import os
 import sys
 import threading
 
 
 class ClientHandler(threading.Thread):
+    """
+    ClientHandler runs as its own thread and is responsible for both adding a client to the chat
+    server and forwarding its messages to the MesssageRelay class.
+    """
     def __init__(self, server_socket, client_socket, message_relay):
         threading.Thread.__init__(self)
         self.server_socket = server_socket

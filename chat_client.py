@@ -1,3 +1,10 @@
+#! /usr/bin/env python
+
+"""
+This script defines a CLI chat client capable of sharing messages to a chat server and sending
+and receiving files P2P with other connected clients.
+"""
+
 import sys
 import socket
 import getopt
@@ -7,6 +14,13 @@ import message_receiver as MR
 
 
 def handle_send_message(client_name, server_socket):
+    """
+    Called when the user types 'M' to send a message. Prompts user, reads input, and formats
+    message for the chat server. Then writes the message to the server's socket.
+    params:
+        client_name
+        server_socket
+    """
     print 'Enter your message:'
     message = sys.stdin.readline().strip()
     if not message:
@@ -20,15 +34,24 @@ def handle_send_message(client_name, server_socket):
             print '[ ERROR ] Could not send message. Code: ' + err[0] + ' Text: ' + err[1]
             sys.exit()
 
-def handle_request_ft(client_name, server_socket, ft_listening_port):
+def handle_request_ft(server_socket, ft_listening_port):
+    """
+    Called when the user types 'F' to request a file transfer from another user. Prompts the
+    user for the file owner's username, and the name of the file (including extension).
+    Then sends the request to the server and spins up an instance of TransferManager locally
+    in its own thread.
+    params:
+        client_name
+        server_socket
+        ft_listening_port
+    """
     print 'Who owns the file?'
     owner = sys.stdin.readline().strip()
     print 'Which file do you want?'
     filename = sys.stdin.readline().strip()
-    if not filename:
-        print '[ ERROR ] Filename could not be read from stdin. exiting.'
-        sys.exit()
 
+    if not filename or not owner:
+        print '[ ERROR ] Filename or username could not be read from stdin.'
     else:
         request = 'FT_REQUEST:' + owner + ':' + filename + ':' + ft_listening_port
         try:
@@ -42,11 +65,20 @@ def handle_request_ft(client_name, server_socket, ft_listening_port):
 
 
 def handle_option(user_input, client_name, server_socket, ft_listening_port):
-    if user_input in ('M', 'm'):
+    """
+    Determines the action requested by the user and executes it.
+    params:
+        user_input
+        client_name
+        server_socket
+        ft_listening_port
+    """
+    user_input = user_input.upper()
+    if user_input == 'M':
         handle_send_message(client_name, server_socket)
-    if user_input in ('F', 'f'):
-        handle_request_ft(client_name, server_socket, ft_listening_port)
-    if user_input in ('X', 'x'):
+    if user_input == 'F':
+        handle_request_ft(server_socket, ft_listening_port)
+    if user_input == 'X':
         print '[ OK ] Exiting chat'
         try:
             server_socket.shutdown(socket.SHUT_RDWR)
@@ -56,12 +88,22 @@ def handle_option(user_input, client_name, server_socket, ft_listening_port):
         sys.exit()
 
 def usage(script_name):
+    """
+    Called when the user attempts to run the script with extra or missing parameters.
+    params:
+        script_name
+    """
     print '[ ERROR ] Usage: python3 ' + script_name + ' -l <listening port number> ' \
 	'-p <connect server port>'
 
 def main():
+    """
+    Reads in the parameters specified by the user, while error-checking, then connects to the
+    specified server. Spins up an instance of MessageReceiver in its own separate thread. Then
+    loops indefinitely on user input.
+    """
     argc = len(sys.argv)
-    if argc < 5 or argc > 5:
+    if not argc == 5:
         usage(sys.argv[0])
         sys.exit()
 
