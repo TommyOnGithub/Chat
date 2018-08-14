@@ -1,10 +1,10 @@
 import threading
 import socket
-import os, sys
+import sys
 import time
 
 
-class MessageReceiver( threading.Thread ):
+class MessageReceiver(threading.Thread):
     def __init__(self, server_socket, client_name):
         threading.Thread.__init__(self)
         self.server_socket = server_socket
@@ -20,11 +20,11 @@ class MessageReceiver( threading.Thread ):
             transfer_socket.connect(('localhost', int(request[3])))
             # print('[ SUCCESS ] Socket bound to port')
         except socket.error as err:
-            print('[ ERROR ] Failed to connect to remote host ' + str(err))
+            print '[ ERROR ] Failed to connect to remote host ' + str(err)
         try:
             send_file = open(request[2], 'rb')           # files to be sent kept in same directory
         except IOError as err:
-            print('[ ERROR ] Could not open file' + str(err))
+            print '[ ERROR ] Could not open file' + str(err)
             transfer_socket.shutdown(socket.SHUT_WR)
             transfer_socket.close()
             return
@@ -35,35 +35,29 @@ class MessageReceiver( threading.Thread ):
             try:
                 transfer_socket.send(piece)
             except socket.error as err:
-                print('[ ERROR ] Unable to send file chunk to remote host: ' + str(err))
-                print(str(time.time()))
+                print '[ ERROR ] Unable to send file chunk to remote host: ' + str(err)
+                print str(time.time())
                 sys.exit()
             piece = send_file.read(1024)
         send_file.close()
         # print('[ SUCCESS ] Finished file transfer.')
         transfer_socket.shutdown(socket.SHUT_WR)
         transfer_socket.close()
-    
+
     def is_ft_request(self, message):
         request = message.split(':')
-        if request[0] == 'FT_REQUEST':
-            return True
-        else:
-            return False
-            
+        return request[0] == 'FT_REQUEST'
+
     def ft_request_for_this_client(self, message):
         request = message.split(':')
-        if request[1] == self.client_name:
-            return True
-        else:
-            return False
-        
+        return request[1] == self.client_name
+
     def run(self):
         while True:
             try:
                 message = self.server_socket.recv(1024).decode()
             except socket.error as err:
-                print('[ ERROR ] Unable to receive messages from server: ' + str(err) + ' Exiting...')
+                print '[ ERROR ] Unable to receive messages from server: ' + str(err)
             if message != '':
                 if self.is_ft_request(message):
                     if self.ft_request_for_this_client(message):
@@ -71,10 +65,9 @@ class MessageReceiver( threading.Thread ):
                     else:
                         continue
                 else:
-                    print(message)
-                print('(\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   (F)ile (request)\n   e(X)it')
+                    print message
+                print '(\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   (F)ile (request)\n   e(X)it'
             else:
-                print('[ ERROR ] Received no bytes, closing socket...')
+                print '[ ERROR ] Received no bytes, closing socket...'
                 self.server_socket.close()
-                os._exit(0)
-        
+                sys.exit()
