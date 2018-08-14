@@ -16,7 +16,7 @@ def usage(script_name):
 def main():
     # Get command line args and check for user error
     argc = len(sys.argv)
-    if argc < 2 or argc > 2:
+    if not argc == 2:
         usage(sys.argv[0])
         sys.exit()
 
