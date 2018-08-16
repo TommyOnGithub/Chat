@@ -1,3 +1,7 @@
+"""
+This module defines the class MessageReceiver which is responsible for 
+"""
+
 import threading
 import socket
 import sys
