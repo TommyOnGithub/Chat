@@ -1,5 +1,7 @@
 """
-This module defines the class MessageReceiver which is responsible for 
+This module defines the class MessageReceiver which runs in it's own thread and is responsible for
+handling messages to the client from the server. One problem with this class is that it has too many
+responsiblities. File sending funcationalities should be separated out into their own class.
 """
 
 import threading
@@ -9,12 +11,23 @@ import time
 
 
 class MessageReceiver(threading.Thread):
+    """
+    MessageReceiver runs in it's own thread and is responsible for handling messages to the client
+    from the server. One problem with this class is that it has too many responsiblities. File
+    sending funcationalities should be separated out into their own class.
+    """
     def __init__(self, server_socket, client_name):
+        """
+        Initializes class member variables.
+        """
         threading.Thread.__init__(self)
         self.server_socket = server_socket
         self.client_name = client_name
 
     def send_file(self, message):
+        """
+        Sends requested file to the requesting party.
+        """
         request = message.split(':')
         # print('request[3] = ' + request[3])
         try:
@@ -49,14 +62,24 @@ class MessageReceiver(threading.Thread):
         transfer_socket.close()
 
     def is_ft_request(self, message):
+        """
+        Quick check to determine if a message from the server should initialize a file transfer.
+        """
         request = message.split(':')
         return request[0] == 'FT_REQUEST'
 
     def ft_request_for_this_client(self, message):
+        """
+        Determines if the file stransfer request is meant for this client.
+        """
         request = message.split(':')
         return request[1] == self.client_name
 
     def run(self):
+        """
+        Core thread funcations - loop on receiving messages from the server and either carry out
+        a file transfer or display the message to the user.
+        """
         while True:
             try:
                 message = self.server_socket.recv(1024).decode()
