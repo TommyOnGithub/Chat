@@ -9,6 +9,8 @@ import socket
 import sys
 import time
 
+import chat_window as cw
+
 
 class MessageReceiver(threading.Thread):
     """
@@ -16,13 +18,14 @@ class MessageReceiver(threading.Thread):
     from the server. One problem with this class is that it has too many responsiblities. File
     sending funcationalities should be separated out into their own class.
     """
-    def __init__(self, server_socket, client_name):
+    def __init__(self, server_socket, client_name, chat_window):
         """
         Initializes class member variables.
         """
         threading.Thread.__init__(self)
         self.server_socket = server_socket
         self.client_name = client_name
+        self.chat_window = chat_window
 
     def send_file(self, message):
         """
@@ -92,8 +95,8 @@ class MessageReceiver(threading.Thread):
                     else:
                         continue
                 else:
-                    print message
-                print '(\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   (F)ile (request)\n   e(X)it'
+                    self.chat_window.update_chat_text(message)
+                # print '(\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   (F)ile (request)\n   e(X)it'
             else:
                 print '[ ERROR ] Received no bytes, closing socket...'
                 self.server_socket.close()

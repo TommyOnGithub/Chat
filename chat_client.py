@@ -8,9 +8,11 @@ and receiving files P2P with other connected clients.
 import sys
 import socket
 import getopt
+import Tkinter as tk
 
 import transfer_manager as TM
 import message_receiver as MR
+import chat_window as cw
 
 
 def handle_send_message(client_name, server_socket):
@@ -129,15 +131,19 @@ def main():
     except socket.error as err:
         print '[ ERROR ] Unable to send response to server: ' + str(err)
 
-    MR.MessageReceiver(server_socket, client_name).start()
+    root = tk.Tk()
+    chat_window = cw.ChatWindow(root, client_name, server_socket, ft_listening_port)
+    MR.MessageReceiver(server_socket, client_name, chat_window).start()
+    
+    root.mainloop()
 
-    while True:
-        print 'Enter an option (\'m\', \'f\', \'x\'):\n   (M)essage (send)\n' \
-		'   (F)ile (request)\n   e(X)it'
-        user_input = sys.stdin.readline().strip()
-        if not user_input:
-            pass
-        handle_option(user_input, client_name, server_socket, ft_listening_port)
+    # while True:
+        # print 'Enter an option (\'m\', \'f\', \'x\'):\n   (M)essage (send)\n' \
+		# '   (F)ile (request)\n   e(X)it'
+        # user_input = sys.stdin.readline().strip()
+        # if not user_input:
+            # pass
+        # handle_option(user_input, client_name, server_socket, ft_listening_port)
 
 if __name__ == "__main__":
     try:

@@ -38,11 +38,12 @@ class ClientHandler(threading.Thread):
         self.message_relay.new_client(self.client_socket, client_name, ft_listening_port)
 
         while True:
+            msg_encoded = ''
             try:
                 msg_encoded = self.message_relay.connections[client_name][0].recv(1024)
             except socket.error as err:
                 print '[ ERROR ] Message recv from client ' + client_name + ' failed: ' + str(err)
 
-            if not msg_encoded == "":
+            if msg_encoded != '':
                 # print('[ OK ] Relaying message ' + msg_encoded.decode())
                 self.message_relay.relay_message(msg_encoded, client_name)
