@@ -54,8 +54,8 @@ class MessageRelay(object):
             from_client_name
         """
         for dest_client_name in list(self.connections):
-            if dest_client_name == from_client_name:
-                continue
+            # if dest_client_name == from_client_name:
+                # continue
             try:
                 self.connections[dest_client_name][0].send(msg_encoded)
             except socket.error as err:
