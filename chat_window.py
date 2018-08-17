@@ -62,7 +62,6 @@ class ChatWindow:
     def send_pressed(self, *args):
         message = self.input_area.get('1.0', Tkinter.END).strip()
         self.send_message(message)
-        self.update_chat_text(self.client_name + ': ' + message)
         self.input_area.delete('1.0', Tkinter.END)
                 
     def request_file_pressed(self):

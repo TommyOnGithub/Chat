@@ -43,7 +43,9 @@ class ClientHandler(threading.Thread):
             try:
                 msg_encoded = self.message_relay.connections[client_name][0].recv(1024)
             except socket.error as err:
+                # client disconnected; remove from connectins dict and terminate this thread.
                 print '[ ERROR ] ' + client_name + ' has disconnected.'
+                del self.message_relay.connections[client_name]
                 sys.exit()
 
             if msg_encoded != '':
