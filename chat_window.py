@@ -47,12 +47,11 @@ class ChatWindow:
         print 'updated_text =', updated_text
         self.chat_text.set(updated_text)
     
-    def send_message(self):
+    def send_message(self, message):
         """
         Reads input from client, then writes the message to the server.
         """
         print '"Send" clicked'
-        message = self.input_area.get('1.0',Tkinter.END).strip()
         if message:
             message = self.client_name + ': ' + message
             try:
@@ -61,7 +60,9 @@ class ChatWindow:
                 print '[ ERROR ] Could not send message. Code: ' + err[0] + ' Text: ' + err[1]
 
     def send_pressed(self, *args):
-        self.send_message()
+        message = self.input_area.get('1.0', Tkinter.END).strip()
+        self.send_message(message)
+        self.update_chat_text(self.client_name + ': ' + message)
         self.input_area.delete('1.0', Tkinter.END)
                 
     def request_file_pressed(self):
