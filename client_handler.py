@@ -42,7 +42,8 @@ class ClientHandler(threading.Thread):
             try:
                 msg_encoded = self.message_relay.connections[client_name][0].recv(1024)
             except socket.error as err:
-                print '[ ERROR ] Message recv from client ' + client_name + ' failed: ' + str(err)
+                print '[ ERROR ] ' + client_name + ' has disconnected.'
+                sys.exit()
 
             if msg_encoded != '':
                 # print('[ OK ] Relaying message ' + msg_encoded.decode())

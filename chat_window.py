@@ -4,7 +4,7 @@ This module defines the class ChatWindow, a GUI for the chat client.
 
 import threading
 import Tkinter
-import ttk
+import tkMessageBox
 
 import transfer_manager as tm
 
@@ -23,12 +23,13 @@ class ChatWindow:
         self.client_name = client_name
         self.server_socket = server_socket
         self.prompt_root = None
+        self.messages_label = None
         self.ft_listening_port = ft_listening_port
         self.mainframe = Tkinter.Frame(self.master, bg='white')
         self.mainframe.pack(fill='both', expand=True)
         
         self.chat_text = Tkinter.StringVar()
-        self.chat_text.trace('w', self.build_message_label)
+        # self.chat_text.trace('w', self.build_message_label)
         
         self.build_grid()
         self.build_message_area()
@@ -42,14 +43,16 @@ class ChatWindow:
         params:
             new_text
         """
-        self.chat_text.set(self.chat_text.get() + new_text + '\n')
+        updated_text = self.chat_text.get() + new_text + '\n'
+        print 'updated_text =', updated_text
+        self.chat_text.set(updated_text)
     
     def send_message(self):
         """
         Reads input from client, then writes the message to the server.
         """
         print '"Send" clicked'
-        message = self.input_area.get('1.0',Tkinter.END)
+        message = self.input_area.get('1.0',Tkinter.END).strip()
         if message:
             message = self.client_name + ': ' + message
             try:
@@ -57,6 +60,10 @@ class ChatWindow:
             except socket.error as err:
                 print '[ ERROR ] Could not send message. Code: ' + err[0] + ' Text: ' + err[1]
 
+    def send_pressed(self, *args):
+        self.send_message()
+        self.input_area.delete('1.0', Tkinter.END)
+                
     def request_file_pressed(self):
         """
         Called when the user clicks 'Request File' to request a file transfer from another user.
@@ -134,7 +141,8 @@ class ChatWindow:
     def build_message_label(self, *args):
         self.messages_label = Tkinter.Label(
             self.message_frame,
-            text=self.current_msg_text()
+            justify=Tkinter.LEFT,
+            textvariable=self.chat_text
         )
         self.messages_label.pack(side='left')
 
@@ -163,6 +171,7 @@ class ChatWindow:
             width=60,
             height=6
         )
+        self.input_area.bind('<Return>', self.send_pressed)
         self.input_area.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
     
     def build_buttons(self):
@@ -176,7 +185,7 @@ class ChatWindow:
         self.send_button = Tkinter.Button(
             buttons_frame,
             text='Send',
-            command=self.send_message
+            command=self.send_pressed
         )
         self.request_ft_button = Tkinter.Button(
             buttons_frame,
