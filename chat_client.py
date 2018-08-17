@@ -104,19 +104,32 @@ def main():
     specified server. Spins up an instance of MessageReceiver in its own separate thread. Then
     loops indefinitely on user input.
     """
-    argc = len(sys.argv)
-    if not argc == 5:
-        usage(sys.argv[0])
-        sys.exit()
+    # argc = len(sys.argv)
+    # if not argc == 5:
+        # usage(sys.argv[0])
+        # sys.exit()
 
-    opts, _ = getopt.getopt(sys.argv[1:], 'l:p:')
-    ft_listening_port = opts[0][1]
-    server_port = opts[1][1]
+    # opts, _ = getopt.getopt(sys.argv[1:], 'l:p:')
+    # ft_listening_port = opts[0][1]
+    # server_port = opts[1][1]
+    server_addr = None
+    server_port = None
+    ft_listening_port = None
+    config = open('config.ini', 'rU').readlines()    # 'U' for cross-platform newline support
+    for line in config:
+        line = line.split('=')
+        if line[0] == 'server':
+            server_addr = line[1].strip()
+        elif line[0] == 'port':
+            server_port = line[1].strip()
+        elif line[0] == 'recv_file_port':
+            ft_listening_port = line[1].strip()
+    print 'addr = %s, port = %s, xfer port = %s' % (server_addr, server_port, ft_listening_port)
 
     # Establish connection with server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # print('[ OK ] Connecting to localhost on port ' + server_port + '...')
-    server_socket.connect(('localhost', int(server_port)))
+    # server_socket.connect(('localhost', int(server_port)))
+    server_socket.connect((server_addr, int(server_port)))
     # print('[ SUCCESS ] Connection established with the server')
 
     # Exchange information about this client with the server
