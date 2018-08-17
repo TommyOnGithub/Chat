@@ -129,7 +129,10 @@ def main():
     # Establish connection with server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # server_socket.connect(('localhost', int(server_port)))
-    server_socket.connect((server_addr, int(server_port)))
+    try:
+        server_socket.connect((server_addr, int(server_port)))
+    except socket.gaierror as gaierror:
+        server_socket.connect((server_addr+'.local', int(server_port)))
     # print('[ SUCCESS ] Connection established with the server')
 
     # Exchange information about this client with the server

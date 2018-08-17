@@ -36,6 +36,7 @@ class ClientHandler(threading.Thread):
         client_name = response[0]
         ft_listening_port = response[1]
         self.message_relay.new_client(self.client_socket, client_name, ft_listening_port)
+        print 'New client %s has joined the server' % client_name
 
         while True:
             msg_encoded = ''

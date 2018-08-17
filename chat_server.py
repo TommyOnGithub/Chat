@@ -61,7 +61,7 @@ def main():
     # print('[ SUCCESS ] Created socket')
     listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
-        listening_socket.bind(('localhost', int(listening_port)))
+        listening_socket.bind(('', int(listening_port)))
         # print('[ SUCCESS ] Socket bound to port ' + listening_port)
     except socket.error as err:
         print '[ ERROR ] Unable to bind socket: ' + str(err)
