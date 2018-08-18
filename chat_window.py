@@ -4,9 +4,10 @@ This module defines the class ChatWindow, a GUI for the chat client.
 
 import threading
 import Tkinter
-import tkMessageBox
+import ttk
 
 import transfer_manager as tm
+
 
 class ChatWindow:
     """
@@ -28,8 +29,8 @@ class ChatWindow:
         self.mainframe = Tkinter.Frame(self.master, bg='white')
         self.mainframe.pack(fill='both', expand=True)
         
+        self.master.title('%s - %s' % ('PyChat', self.client_name))
         self.chat_text = Tkinter.StringVar()
-        # self.chat_text.trace('w', self.build_message_label)
         
         self.build_grid()
         self.build_message_area()
@@ -74,45 +75,51 @@ class ChatWindow:
         """
         # Launch a mini-window to prompt user for file owner and filename
         self.prompt_root = Tkinter.Tk()
-        prompt_mainframe = Tkinter.Frame(prompt_root, bg='white')
+        prompt_mainframe = Tkinter.Frame(self.prompt_root, bg='white')
         prompt_mainframe.pack(fill='both')
         prompt_mainframe.columnconfigure(0, weight=1)
-        prompt_mainframe.rowconfigure(0, weight=0)
+        prompt_mainframe.rowconfigure(0, weight=1)
         prompt_mainframe.rowconfigure(1, weight=0)
         prompt_mainframe.rowconfigure(2, weight=0)
-        prompt_mainframe.rowconfigure(3, weight=0)
-        prompt_mainframe.rowconfigure(4, weight=0)
-        name_label = Tkinter.Label(prompt_mainframe, text='User name:')
-        name_label.pack()
-        self.name_input = Tkinter.Entry(prompt_mainframe)
+        name_frame = Tkinter.Frame(prompt_mainframe, bg='white')
+        name_frame.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
+        name_label = Tkinter.Label(name_frame, bg='white', text='User name:').pack()
+        self.name_input = Tkinter.Entry(name_frame)
         self.name_input.pack()
-        fname_label = Tkinter.Label(prompt_mainframe, text='File name:')
-        fname_label.pack()
-        self.fname_input = Tkinter.Entry(prompt_mainframe)
+        fname_frame = Tkinter.Frame(prompt_mainframe, bg='white')
+        fname_frame.grid(row=1, column=0, sticky='ew', padx=10, pady=10)
+        fname_label = Tkinter.Label(fname_frame, bg='white', text='File name:').pack()
+        self.fname_input = Tkinter.Entry(fname_frame)
+        self.fname_input.bind('<Return>', self.ok_pressed)
         self.fname_input.pack()
         ok_button = Tkinter.Button(
             prompt_mainframe,
             text='OK',
-            command=ok_pressed
+            width=4,
+            command=self.ok_pressed
         )
+        ok_button.grid(row=2, column=0, sticky='ew', padx=10, pady=10)
 
-    def ok_pressed(self):
+    def ok_pressed(self, *args):
         """
         Called when user clicks "OK" button after filling in the user name and file name.
+        this causes the TransferManager to run and kills the File Request dialog box.
         """
-        owner = self.name_input.get()
-        file_name = self.fname_input.get()
+        owner = self.name_input.get().strip()
+        file_name = self.fname_input.get().strip()
         if not file_name or not owner:
             print '[ ERROR ] Filename or username could not be read from stdin.'
         else:
-            request = 'FT_REQUEST:' + owner + ':' + filename + ':' + ft_listening_port
+            request = 'FT_REQUEST:' + owner + ':' + file_name + ':' + self.ft_listening_port
             try:
                 # print('request sent at: ' + str(time.time()))
                 self.server_socket.send(request.encode())
             except socket.error as err:
                 print '[ ERROR ] Could not connect to server: ' + str(err) + ' Exiting...'
 
-            tm.TransferManager(ft_listening_port, filename, owner).start()
+            tm.TransferManager(self.ft_listening_port, file_name, owner).start()
+        
+        self.prompt_root.destroy()
 
     def build_grid(self):
         """
@@ -141,6 +148,7 @@ class ChatWindow:
     def build_message_label(self, *args):
         self.messages_label = Tkinter.Label(
             self.message_frame,
+            height=8,
             justify=Tkinter.LEFT,
             textvariable=self.chat_text
         )
@@ -182,12 +190,12 @@ class ChatWindow:
         buttons_frame.grid(row=2, column=0, sticky='ew', padx=10, pady=10)
         buttons_frame.columnconfigure(0, weight=1)
         
-        self.send_button = Tkinter.Button(
+        self.send_button = ttk.Button(
             buttons_frame,
             text='Send',
             command=self.send_pressed
         )
-        self.request_ft_button = Tkinter.Button(
+        self.request_ft_button = ttk.Button(
             buttons_frame,
             text='Request File',
             command=self.request_file_pressed

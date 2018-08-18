@@ -41,6 +41,7 @@ class MessageReceiver(threading.Thread):
             # print('[ SUCCESS ] Socket bound to port')
         except socket.error as err:
             print '[ ERROR ] Failed to connect to remote host ' + str(err)
+            return
         try:
             send_file = open(request[2], 'rb')           # files to be sent kept in same directory
         except IOError as err:
@@ -57,7 +58,7 @@ class MessageReceiver(threading.Thread):
             except socket.error as err:
                 print '[ ERROR ] Unable to send file chunk to remote host: ' + str(err)
                 print str(time.time())
-                sys.exit()
+                return
             piece = send_file.read(1024)
         send_file.close()
         # print('[ SUCCESS ] Finished file transfer.')

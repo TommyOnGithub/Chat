@@ -3,9 +3,12 @@ This module defines the TransferManager class, which is responsible for receivin
 writing requested files to the local host.
 """
 
+import os
 import socket
 import threading
 
+
+FILES_FOLDER = 'received_files'
 
 class TransferManager(threading.Thread):
     """
@@ -34,8 +37,10 @@ class TransferManager(threading.Thread):
         """
         piece = None
 
-        # Save the received file in the local directory
-        recv_file = open(self.filename, 'wb')
+        # Save the received file in the FILES_FOLDER directory
+        if not os.path.isdir(FILES_FOLDER):
+            os.makedirs(FILES_FOLDER)
+        recv_file = open(os.path.join(FILES_FOLDER, self.filename), 'wb')
         # print('[ OK ] Initiating file transfer...')
         try:
             piece = file_host.recv(1024)
