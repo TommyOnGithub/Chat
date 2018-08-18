@@ -9,8 +9,6 @@ import socket
 import sys
 import time
 
-import chat_window as cw
-
 
 class MessageReceiver(threading.Thread):
     """
@@ -89,6 +87,8 @@ class MessageReceiver(threading.Thread):
                 message = self.server_socket.recv(1024).decode()
             except socket.error as err:
                 print '[ ERROR ] Unable to receive messages from server: ' + str(err)
+                self.server_socket.close()
+                sys.exit
             if message != '':
                 if self.is_ft_request(message):
                     if self.ft_request_for_this_client(message):
@@ -97,7 +97,6 @@ class MessageReceiver(threading.Thread):
                         continue
                 else:
                     self.chat_window.update_chat_text(message)
-                # print '(\'m\', \'f\', \'x\'):\n   (M)essage (send)\n   (F)ile (request)\n   e(X)it'
             else:
                 print '[ ERROR ] Received no bytes, closing socket...'
                 self.server_socket.close()

@@ -58,11 +58,9 @@ def main():
     except socket.error as err:
         print '[ ERROR ] Could not create socket. Code: ' + str(err[0]) + ' Description: ' + err[1]
         sys.exit()
-    # print('[ SUCCESS ] Created socket')
     listening_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
         listening_socket.bind(('', int(listening_port)))
-        # print('[ SUCCESS ] Socket bound to port ' + listening_port)
     except socket.error as err:
         print '[ ERROR ] Unable to bind socket: ' + str(err)
         sys.exit()
@@ -72,11 +70,9 @@ def main():
     message_relay = MR.MessageRelay(listening_socket)
 
     listening_socket.listen(5)
-    # print('[ OK ] Listening on port ' + listening_port)
 
     while True:
         client_socket, _ = listening_socket.accept()
-        # print('[ OK ] New connection ' + addr[0] + ':' + str(addr[1]))
         handle_new_client(listening_socket, client_socket, message_relay)
 
 if __name__ == "__main__":
