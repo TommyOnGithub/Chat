@@ -35,7 +35,9 @@ class ClientHandler(threading.Thread):
         response = response_encoded.decode().split(':')
         client_name = response[0]
         ft_listening_port = response[1]
+        self.message_relay.relayLock.acquire(1)
         self.message_relay.new_client(self.client_socket, client_name, ft_listening_port)
+        self.message_relay.relayLock.release()
         print 'New client %s has joined the server' % client_name
 
         while True:
@@ -50,4 +52,4 @@ class ClientHandler(threading.Thread):
 
             if msg_encoded != '':
                 # print('[ OK ] Relaying message ' + msg_encoded.decode())
-                self.message_relay.relay_message(msg_encoded, client_name)
+                self.message_relay.relay_message(msg_encoded)

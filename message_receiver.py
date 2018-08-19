@@ -1,5 +1,5 @@
 """
-This module defines the class MessageReceiver which runs in it's own thread and is responsible for
+This module defines the class MessageReceiver which runs in its own thread and is responsible for
 handling messages to the client from the server. One problem with this class is that it has too many
 responsiblities. File sending funcationalities should be separated out into their own class.
 """
@@ -83,6 +83,7 @@ class MessageReceiver(threading.Thread):
         a file transfer or display the message to the user.
         """
         while True:
+            message = ''
             try:
                 message = self.server_socket.recv(1024).decode()
             except socket.error as err:

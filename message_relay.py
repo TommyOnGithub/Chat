@@ -5,6 +5,7 @@ clients are connected and which have disconnected from the server.
 """
 
 import socket
+import threading
 
 
 class MessageRelay(object):
@@ -21,6 +22,7 @@ class MessageRelay(object):
         """
         self.server_socket = server_socket
         self.connections = {}
+        self.relayLock = threading.Lock()
 
     def new_client(self, client_socket, client_name, ft_listening_port):
         """
