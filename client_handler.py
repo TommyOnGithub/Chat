@@ -6,6 +6,7 @@ for both adding a client to the chat server and forwarding its messages to the M
 import socket
 import sys
 import threading
+import logging
 
 
 class ClientHandler(threading.Thread):

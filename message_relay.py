@@ -5,6 +5,10 @@ clients are connected and which have disconnected from the server.
 """
 
 import socket
+import logging
+import datetime
+
+from logging_service import *
 
 
 class MessageRelay(object):
@@ -22,6 +26,7 @@ class MessageRelay(object):
         self.server_socket = server_socket
         self.connections = {}
 
+    @LoggingService.logged
     def new_client(self, client_socket, client_name, ft_listening_port):
         """
         Adds the given client to the list of clients to which messages will be broadcasted.
@@ -45,12 +50,12 @@ class MessageRelay(object):
         except socket.error as err:
             print '[ ERROR ] ' + str(err)
 
+    @LoggingService.logged
     def relay_message(self, msg_encoded):
         """
         This method writes the encoded message to all clients except for that of the sender.
         params:
             msg_encoded
-            from_client_name
         """
         for dest_client_name in list(self.connections):
             try:
@@ -58,3 +63,16 @@ class MessageRelay(object):
             except socket.error as err:
                 print '[ ERROR ] Unable to send message to client "' + dest_client_name + '" '
                 print str(err)
+
+    @staticmethod
+    def logged(orig_func):
+        logging.basicConfig(filename='chat_server.log', level=logging.INFO)
+
+        @wraps(orig_func)
+        def wrapper(*args, **kwargs):
+            logging.info('{}: {} executed with args={}, kwargs={}.'
+                .format(datetime.datetime, orig_func.__name__, args, kwargs)
+            )
+            return orig_func(*args, **kwargs)
+
+        return wrapper
